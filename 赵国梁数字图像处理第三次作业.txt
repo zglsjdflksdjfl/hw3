@@ -1,0 +1,161 @@
+一．以elian系列为例：
+(1) 直方图子函数：
+function glh(I)
+[rows , cols] = size(I);%得到图像矩阵的行、列数  
+ZF = zeros(1,256);%初始化一个矩阵，用来存储灰度图像中每个像素出现的频率  
+for i = 0:255  
+    ZF(1,i+1) = length(find(I== i)) / (rows * cols);%计算矩阵中值与i相等的元素的个数  
+end  
+bar(0:255 , ZhiFang , 'grouped');%根据bar绘制直方图  
+xlabel('灰度值');  
+ylabel('出现次数');  
+%axis([0 255 0 1]);%axis函数用来设置画面横坐标及纵坐标的上下限  
+（2）主程序：
+close all
+clear
+clc
+I=imread('C:\Users\Administrator\Desktop\第三次作业\elain.bmp');
+imhist(I);
+figure(1)
+title('elain.bmp的直方图');
+ 
+[A1,map1]=imread('C:\Users\Administrator\Desktop\第三次作业\elain1.bmp');
+G1=ind2gray(A1,map1);
+figure(2)
+imhist(G1);
+title('elain1.bmp的直方图');
+[A2,map2]=imread('C:\Users\Administrator\Desktop\第三次作业\elain2.bmp');
+G2=ind2gray(A2,map2);
+figure(3)
+imhist(G2);
+title('elain2.bmp的直方图');
+ 
+[A3,map3]=imread('C:\Users\Administrator\Desktop\第三次作业\elain3.bmp');
+G3=ind2gray(A3,map3);
+figure(4)
+imhist(G3);
+title('elain3.bmp的直方图');
+二．以elain1为例：
+[A1,map1]=imread('C:\Users\Administrator\Desktop\第三次作业\elain1.bmp');
+I=ind2gray(A1,map1);
+subplot(121);
+imshow(I);
+title('灰度图');
+ 
+[R, C] = size(I);
+ 
+% 统计每个像素值出现次数
+cnt = zeros(1, 256);
+for i = 1 : R
+    for j = 1 : C
+        cnt(1, I(i, j) + 1) = cnt(1, I(i, j) + 1) + 1;
+    end
+end
+ 
+f = zeros(1, 256);
+f = double(f); cnt = double(cnt);
+ 
+% 统计每个像素值出现的概率， 得到概率直方图
+for i = 1 : 256
+    f(1, i) = cnt(1, i) / (R * C);
+end
+ 
+% 求累计概率，得到累计直方图
+for i = 2 : 256
+    f(1, i) = f(1, i - 1) + f(1, i);
+end
+ 
+% 用f数组实现像素值[0, 255]的映射。 
+for i = 1 : 256
+    f(1, i) = f(1, i) * 255;
+end
+ 
+% 完成每个像素点的映射
+I = double(I);
+for i = 1 : R
+    for j = 1 : C
+        I(i, j) = f(1, I(i, j) + 1);
+    end
+end
+ 
+% 输出
+I = uint8(I);
+subplot(122);
+imshow(I);
+title('直方图均衡化');
+三．
+clc
+clear
+[A map]=imread('C:\Users\Administrator\Desktop\第三次作业\citywall2.bmp');
+I=ind2gray(A,map);
+[A2 map2]=imread('C:\Users\Administrator\Desktop\第三次作业\citywall.bmp');
+I2=ind2gray(A2,map2);
+hsp=imhist(I2);
+g=histeq(I,hsp);
+figure;v=[0 255 0 3000];
+imshow(g);
+title('直方图匹配增强后的图像');
+figure;subplot(311);
+glh(I);
+title(strcat('原图的直方图'));
+subplot(312);
+glh(I2);  
+title(strcat('匹配图的直方图')); 
+subplot(313);
+glh(g);
+title('增强后图像直方图'); 
+
+四．
+clear;
+close all;
+img=imread('C:\Users\Administrator\Desktop\第三次作业\lena.bmp');
+figure,imshow(img);
+title('原始图像');
+%构建模板
+n=7;
+model(1:n,1:n)=1;%a为n*n大小的模板，像素值为1
+imgTend=wextend('2D','sym',img,n);
+tendTrans=double(imgTend);%变成double型便于后期的点乘计算
+[row,col]=size(imgTend);%获取扩展后的图像的大小
+tendTransTmp=tendTrans;
+for i=n+1:row-n
+    for j=n+1:col-n 
+        modelResult=tendTrans(i:i+(n-1),j:j+(n-1)).
+        modelEpual=histeq(uint8(modelResult));
+        equalTmp=double(modelEpual);
+        tendTransTmp(i,j)=equalTmp(4,4);%将均衡后的中心点的像素值赋给原图对应点的元素
+    end
+end
+%未被赋值的元素取原值
+result=tendTransTmp(n+1:row-n,n+1:col-n);%均衡化后取原图像大小
+result=uint8(result);
+%d=uint8(x2);
+figure,imshow(result);
+title('均衡后的图像');
+五．
+close all
+clc
+clear
+[A1,map1]=imread('C:\Users\Administrator\Desktop\第三次作业\elain.bmp');
+G1=ind2gray(A1,map1);
+glh(G1);
+title('直方图');
+figure;
+subplot(1,2,1);
+imshow(G1);
+title('原图');
+t1=125;
+[m n]=size(G1);
+I1=zeros(m,n);
+for i=1:m
+    for j=1:n
+        if G1(i,j)>t1
+            I1(i,j)=1;
+        else
+            I1(i,j)=0;
+        end
+    end
+end
+subplot(1,2,2);
+imshow(I1);
+title('分割后');
